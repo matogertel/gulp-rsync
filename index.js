@@ -29,7 +29,7 @@ module.exports = function(options) {
 
   var cwd = options.root ? path.resolve(options.root) : process.cwd();
 
-  return through.obj(function(file, enc, cb) {
+  return through.obj({highWaterMark: 100000000}, function(file, enc, cb) {
     if (file.isStream()) {
       this.emit(
         'error',
@@ -59,8 +59,10 @@ module.exports = function(options) {
     }
 
     var shell = options.shell;
-    if (options.port) {
-      shell = 'ssh -p ' + options.port;
+    if (options.port || options['ssh-options']) {
+      shell = 'ssh ';
+      if (options.port) shell += '-p ' + options.port+' ';
+      if (options['ssh-options']) shell += options['ssh-options']+' ';
     }
 
     var destination = options.destination;
@@ -86,7 +88,8 @@ module.exports = function(options) {
         'z': options.compress,
         'exclude': options.exclude,
         'include': options.include,
-        'progress': options.progress
+        'progress': options.progress,
+        'ssh-options': options['ssh-options']
       },
       source: sources.map(function(source) {
         return path.relative(cwd, source.path) || '.';
