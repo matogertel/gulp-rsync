@@ -88,8 +88,7 @@ module.exports = function(options) {
         'z': options.compress,
         'exclude': options.exclude,
         'include': options.include,
-        'progress': options.progress,
-        'ssh-options': options['ssh-options']
+        'progress': options.progress
       },
       source: sources.map(function(source) {
         return path.relative(cwd, source.path) || '.';
